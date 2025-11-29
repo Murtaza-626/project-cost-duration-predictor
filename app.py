@@ -3,12 +3,11 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression # NEW: Import Linear Regression
+from sklearn.linear_model import LinearRegression 
 from sklearn.ensemble import RandomForestRegressor
 import joblib
 
-# --- 1. CACHED ML PIPELINE SETUP (ADJUSTED FOR LINEAR REGRESSION) ---
-# This function now trains and returns the Linear Regression models.
+# ML PIPELINE SETUP (ADJUSTED FOR LINEAR REGRESSION) 
 @st.cache_resource
 def setup_ml_pipeline(data_path):
     # --- Data Preparation (Same as Part 1) ---
@@ -44,8 +43,7 @@ def setup_ml_pipeline(data_path):
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train) 
     
-    # --- Train Final LINEAR REGRESSION Models ---
-    # Linear models REQUIRE scaled features for reliable training.
+    # Training Final linear regression Models 
     
     # Cost Model
     lr_cost = LinearRegression()
@@ -60,7 +58,6 @@ def setup_ml_pipeline(data_path):
 
 # Execute the pipeline and load assets
 try:
-    # NOTE: The variable names are changed to reflect the new model
     COST_MODEL, DURATION_MODEL, SCALER, FEATURE_NAMES = setup_ml_pipeline("bim_ai_civil_engineering_dataset.csv")
 except FileNotFoundError:
     st.error("Error: The file 'bim_ai_civil_engineering_dataset.csv' was not found.")
@@ -70,7 +67,7 @@ except Exception as e:
     st.stop()
 
 
-# --- 2. INPUT PREPROCESSING ENGINE (UPDATED FOR SCALING) ---
+# INPUT PREPROCESSING ENGINE (UPDATED FOR SCALING) 
 def prepare_input_for_model(raw_input_data, feature_names, scaler):
     """Transforms raw user input into the correctly encoded and SCALED vector."""
 
@@ -96,14 +93,14 @@ def prepare_input_for_model(raw_input_data, feature_names, scaler):
     # Return the scaled array for prediction
     return scaled_array
 
-# --- 3. STREAMLIT UI AND INPUT COLLECTION ---
+# 3. STREAMLIT UI AND INPUT COLLECTION 
 
 st.title("🏗️ ML Project Cost & Duration Predictor")
 st.markdown("Forecast construction project metrics using our predictive **Linear Regression** models.")
 
 st.sidebar.header("Project Parameters (What-If Scenario)")
 
-# Collect user inputs for all 29 features
+# Collect user inputs for all features
 
 # A. Categorical Features (for selection)
 PROJECT_TYPES = ['Tunnel', 'Dam', 'Building', 'Road', 'Bridge']
@@ -137,7 +134,7 @@ anomaly_detected = st.sidebar.selectbox("Anomaly Detected (1=Yes, 0=No):", [0, 1
 completion_percent = st.sidebar.slider("Completion Percentage:", 10.0, 100.0, 50.0)
 
 
-# --- 4. PREDICTION LOGIC ---
+# PREDICTION LOGIC 
 if st.sidebar.button("Generate Forecast"):
     # Collect all inputs into a single DataFrame row for preprocessing
     raw_input_data = pd.DataFrame({
@@ -175,7 +172,7 @@ if st.sidebar.button("Generate Forecast"):
         cost_pred = np.expm1(cost_log_pred)
         duration_pred = np.expm1(duration_log_pred)
         
-        # --- 5. Display Results ---
+        # Displaying Results 
         st.header("Automated Forecasts")
         col1, col2 = st.columns(2)
         
@@ -187,4 +184,5 @@ if st.sidebar.button("Generate Forecast"):
         st.success("Forecast generated successfully for the 'What-If' scenario!")
         
     except Exception as e:
+
         st.error(f"Prediction error: {e}")
